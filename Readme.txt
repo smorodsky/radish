@@ -1,0 +1,1 @@
+Simple version control for documents of Adobe InDesign/InCopy
