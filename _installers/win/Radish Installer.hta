@@ -1,0 +1,226 @@
+<!-- saved from url=(0014)about:internet -->
+<!-- 
+Radish Installer for Windows
+
+Copytight: Konstantin Smorodsky
+License: MIT
+
+2012-01-12
+-->
+<html>
+  <head>
+    <title>Radish Setup</title>
+      <hta:application
+      applicationName="Radish Setup"
+      icon="%SystemRoot%\system32\setup.exe"
+      innerBorder="no"
+      selection="yes"
+      scroll="no"
+      caption="yes"
+      maximizebutton="no"
+      minimizebutton="no"
+      contextmenu="no" />
+    <style type="text/css">
+    </style>
+
+
+<style>
+body, html {
+margin:0px;
+padding:0px;
+height: 100%;
+}
+* html #maket {
+height: 100%;
+}
+
+#maket {
+	width:100%;
+	margin:0 auto;
+	min-height: 100%;
+}
+
+#header{
+}
+
+#left{
+	width:200px;
+	float:left;
+	text-align:center; 
+}
+
+#content{
+	margin-left:202px;
+	margin-right:202px;
+}
+#footer{
+	clear:both;
+	width: 100%;
+	height: 50px;
+	margin-top:-50px;
+	margin-left: auto;
+	margin-right: 
+	padding-right:111;
+	text-align: right;
+}
+#rasporka {
+	height: 50px;
+}
+
+.btn {
+	padding-left:11;
+	padding-right:11;
+	margin-right:22;
+}
+
+.btn-space{
+	width:111;
+}
+</style>
+
+  </head>
+  <body bgcolor="buttonface">
+	
+<div id="maket">
+ 
+<div id="header"> </div>
+<div id="left"><img src="http://www.machackpc.com/wp-content/uploads/2011/05/installer.png" width="155"></div>
+<div id="content"><h1>Radish Setup</h1>
+<p>This program will install the script Radish on your computer. Select the programs to continue the installation:<p>
+<p id="pogslist"></p></div>
+<div id="rasporka"></div>
+</div>
+<div id="footer"><input class="btn" type="button" value="Abort" onclick="window.close()"><input class="btn" id="btnInstall" type="button" value="Install" onclick="install()"  disabled></div></div>
+  </body>
+
+
+<script>
+var shell = new ActiveXObject("WScript.shell"); 
+var fso = new ActiveXObject("Scripting.FileSystemObject");
+var init_ok = true;
+	
+var seek_component = function(arc_name) {
+	var install_folder = fso.GetFile(decodeURI(document.URL).substr(7)).ParentFolder;
+	var arc_file_name = fso.BuildPath(install_folder.path, arc_name);
+	
+	if (fso.FileExists(arc_file_name)) {
+		return fso.GetFile(arc_file_name);
+	} 
+	alert('A required file "' + arc_name + '"');
+	window.close();
+	return null;
+}
+var zip = seek_component('radish.zip');
+
+var get_markets_name = function(folder_name) {
+	folder_name = folder_name.toUpperCase();
+	if (folder_name == 'VERSION 6.0') return 'CS 4';
+	if (folder_name == 'VERSION 7.0') return 'CS 5';
+	if (folder_name == 'VERSION 7.5') return 'CS 5.5';
+	if (folder_name == 'VERSION 8.0') return 'CS 6';
+	if (folder_name == 'VERSION 9.0') return 'CS 7';
+	return null;
+}
+
+var add_paths = function(list, app_path) {
+	if (!fso.FolderExists(app_path)) {
+		return;
+	}
+	var app_folder = fso.GetFolder(app_path);
+	var fc = new Enumerator(app_folder.SubFolders);
+
+	for (;!fc.atEnd(); fc.moveNext()) {
+        	var folder = fc.item();
+		var markets_name = get_markets_name(folder.Name);
+
+		if (markets_name) {
+			list.push({
+				name: app_folder.Name + ' ' + markets_name, 
+				folder: folder});
+		}
+		
+	}
+}
+
+var seek_targets = function() {
+	try {
+		var appdata = shell.ExpandEnvironmentStrings("%APPDATA%");
+		
+		if (!appdata) {
+			throw new Error('Error');
+		}
+		var rc = [];
+		add_paths(rc, fso.BuildPath(appdata, 'Adobe\\InDesign'));
+		add_paths(rc, fso.BuildPath(appdata, 'Adobe\\InCopy'));
+	} catch (e) {
+		alert(e.message);
+		window.close();
+	}
+	return rc;
+}
+var targets_list = seek_targets();
+
+if (targets_list.length) {
+	var list_root = document.getElementById("pogslist");
+	
+	for (var i = 0, l = targets_list.length; i < l; i++) {
+		var p = document.createElement("p");
+		p.innerHTML = '<input id="prog' + i + '" type="checkbox" onclick="checkselected()">' + targets_list[i].name;
+		list_root.appendChild(p);
+	}
+} else {
+	init_ok = false;
+	list_root.appendChild(document.createTextNode('(programs not found)'));
+	//alert('Programs not found');
+	window.close();
+}
+
+// btnInstall controller
+var checkselected = function() {
+	var i = 0, fl = true;
+	while (fl) {
+		var el = document.getElementById('prog' + i++);
+		if (!el) break;
+		fl = !el.checked;
+	}
+	document.getElementById('btnInstall').disabled = fl;
+}
+var unzip = function (zip_file, toFolder_path) {
+	var sa =  new ActiveXObject("Shell.Application");
+	var filesInzip = sa.NameSpace(zip_file.path).Items();
+	var targetFolder = sa.NameSpace(toFolder_path);
+	targetFolder.CopyHere(filesInzip);
+}
+
+var install = function() {
+	var i = 0, fl, errors = [];
+	while (true) {
+		var el = document.getElementById('prog' + i);
+		if (!el) break;
+		if (el.checked) {
+			fl = true;
+			var fc = new Enumerator(targets_list[i].folder.SubFolders);
+
+			for (;!fc.atEnd(); fc.moveNext()) {
+        			var folder = fc.item();
+				var scripts_folder_path = fso.BuildPath(folder.Path, 'Scripts');
+				
+				if (fso.FolderExists(scripts_folder_path)) {
+					unzip(zip, scripts_folder_path);
+					fl = false;
+				}
+			}
+			if (fl) {
+				errors.push(targets_list[i].name);
+			}
+		}
+		i++;
+	}
+	if (errors.length) {
+		alert('Error. Cannot install in to\n' + errors.join(',\n'));
+	}
+	window.close();
+}
+	
+</script>
+</html>
