@@ -5,7 +5,7 @@ Radish Installer for Windows
 Copytight: Konstantin Smorodsky
 License: MIT
 
-2012-01-12
+2012-02-06
 -->
 <html>
   <head>
@@ -95,10 +95,62 @@ height: 100%;
 
 
 <script>
-var shell = new ActiveXObject("WScript.shell"); 
-var fso = new ActiveXObject("Scripting.FileSystemObject");
-var init_ok = true;
+// return true if existsts runing process with spec filename
+var isRuning = function(appExeName) {
+	appExeName = appExeName.toUpperCase();
+	//var shell = new ActiveXObject("WScript.shell"); 
+	// Get Object and create enumerator 
+	var e = new Enumerator(GetObject("winmgmts:").InstancesOf("Win32_process"));
+	// Loop through processes 
+	for (;!e.atEnd();e.moveNext()){
+		// Get object from enumerator 
+		var p = e.item ();
+ 
+		// seek
+		if (p.Name.toUpperCase() == appExeName) return true;
+	}
+	return false;
+}
+
+// true if regPath exists
+var existsRegPath = function(regPath) {
+	try {
+		var rc = shell.RegRead(regPath); 
+		return rc || true;
+	} catch (e) {}
 	
+	return false;
+}
+
+var seekProgVer = function(apps, progName, progVer) {
+	var regPath = 'HKLM\\SOFTWARE\\Adobe\\' + progName + '\\' + progVer + '\\';
+	
+	if (existsRegPath(regPath)) {
+		// if exists root then check lang key
+		var langKey = regPath + 'Installer Locale Setting';
+		var langKeyValue = existsRegPath(langKey);
+		if (langKeyValue && langKeyValue.length == 5) {
+			var appdata = shell.ExpandEnvironmentStrings("%APPDATA%");
+			if (!appdata) {
+				throw new Error('Error\nCannot detect ApplicationData folder');
+				window.close();
+			}
+			var path = fso.BuildPath(
+				appdata, 
+				'Adobe\\' + progName + 
+				'\\Version ' + progVer + 
+				'\\' + langKeyValue +
+				'\\Scripts\\');
+			apps.push({
+				app:  progName,
+				ver:  progVer,
+				path: path
+			});
+			return true;
+		}
+	}
+	return false;
+}
 var seek_component = function(arc_name) {
 	var install_folder = fso.GetFile(decodeURI(document.URL).substr(7)).ParentFolder;
 	var arc_file_name = fso.BuildPath(install_folder.path, arc_name);
@@ -110,69 +162,57 @@ var seek_component = function(arc_name) {
 	window.close();
 	return null;
 }
+
+/////////////////////////////////////////////////////////////////
+var shell = new ActiveXObject("WScript.shell"); 
+var fso = new ActiveXObject("Scripting.FileSystemObject");
 var zip = seek_component('radish.zip');
+var init_ok = true;
 
-var get_markets_name = function(folder_name) {
-	folder_name = folder_name.toUpperCase();
-	if (folder_name == 'VERSION 6.0') return 'CS 4';
-	if (folder_name == 'VERSION 7.0') return 'CS 5';
-	if (folder_name == 'VERSION 7.5') return 'CS 5.5';
-	if (folder_name == 'VERSION 8.0') return 'CS 6';
-	if (folder_name == 'VERSION 9.0') return 'CS 7';
-	return null;
-}
-
-var add_paths = function(list, app_path) {
-	if (!fso.FolderExists(app_path)) {
-		return;
-	}
-	var app_folder = fso.GetFolder(app_path);
-	var fc = new Enumerator(app_folder.SubFolders);
-
-	for (;!fc.atEnd(); fc.moveNext()) {
-        	var folder = fc.item();
-		var markets_name = get_markets_name(folder.Name);
-
-		if (markets_name) {
-			list.push({
-				name: app_folder.Name + ' ' + markets_name, 
-				folder: folder});
-		}
-		
-	}
-}
-
-var seek_targets = function() {
-	try {
-		var appdata = shell.ExpandEnvironmentStrings("%APPDATA%");
-		
-		if (!appdata) {
-			throw new Error('Error');
-		}
-		var rc = [];
-		add_paths(rc, fso.BuildPath(appdata, 'Adobe\\InDesign'));
-		add_paths(rc, fso.BuildPath(appdata, 'Adobe\\InCopy'));
-	} catch (e) {
-		alert(e.message);
-		window.close();
-	}
-	return rc;
-}
-var targets_list = seek_targets();
-
-if (targets_list.length) {
-	var list_root = document.getElementById("pogslist");
+// check runing
+while (true){
+	var id_is_runing = isRuning('indesign.exe');
+	var ic_is_runing = isRuning('incopy.exe');
 	
-	for (var i = 0, l = targets_list.length; i < l; i++) {
+	// if all closed - continue install
+	if (!id_is_runing && !ic_is_runing) break;
+	
+	var rc = confirm('Please close programms before continue:\n' +
+		(id_is_runing ? 'InDesign\n' : '') +
+		(ic_is_runing ? 'InCopy\n' : '')
+	)
+	if (!rc) {
+		alert('Restart the program after end of installation');
+		break;
+	}
+}
+
+//  seek applications
+var apps = [];
+seekProgVer(apps, 'InDesign', '5.0');
+seekProgVer(apps, 'InDesign', '6.0');
+seekProgVer(apps, 'InDesign', '7.0');
+seekProgVer(apps, 'InDesign', '7.5');
+seekProgVer(apps, 'InDesign', '8.0');
+seekProgVer(apps, 'InCopy', '5.0');
+seekProgVer(apps, 'InCopy', '6.0');
+seekProgVer(apps, 'InCopy', '7.0');
+seekProgVer(apps, 'InCopy', '7.5');
+seekProgVer(apps, 'InCopy', '8.0');
+
+if (0 == apps.length) {
+	alert('Cannot find installed InDesign or InCopy applications');
+	window.close();
+} else {
+		var list_root = document.getElementById("pogslist");
+	
+	for (var i = 0, l = apps.length; i < l; i++) {
 		var p = document.createElement("p");
-		p.innerHTML = '<input id="prog' + i + '" type="checkbox" onclick="checkselected()">' + targets_list[i].name;
+		p.innerHTML = '<input id="prog' + i + 
+			'" type="checkbox" onclick="checkselected()">' + 
+			apps[i].app + ' ' + apps[i].ver;
 		list_root.appendChild(p);
 	}
-} else {
-	init_ok = false;
-	list_root.appendChild(document.createTextNode('(programs not found)'));
-	//alert('Programs not found');
-	window.close();
 }
 
 // btnInstall controller
@@ -199,19 +239,20 @@ var install = function() {
 		if (!el) break;
 		if (el.checked) {
 			fl = true;
-			var fc = new Enumerator(targets_list[i].folder.SubFolders);
-
-			for (;!fc.atEnd(); fc.moveNext()) {
-        			var folder = fc.item();
-				var scripts_folder_path = fso.BuildPath(folder.Path, 'Scripts');
-				
-				if (fso.FolderExists(scripts_folder_path)) {
-					unzip(zip, scripts_folder_path);
-					fl = false;
-				}
+			var path = apps[i].path;
+			
+			try {
+				fso.CreateFolder(path);
+			} catch(e) {}
+			try {
+				unzip(zip, path);
+				fl = false;
+			} catch (e) {
+				alert(e.message);
 			}
+			
 			if (fl) {
-				errors.push(targets_list[i].name);
+				errors.push(apps[i].app + ' ' + apps[i].ver);
 			}
 		}
 		i++;
