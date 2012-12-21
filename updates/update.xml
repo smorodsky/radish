@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionUpdateInformation>
+	<version>25</version>
+	<download>http://github.com/smorodsky/radish/raw/master/radish.zxp</download>
+	<description url="http://raw.github.com/smorodsky/radish/master/updates/updates.html">
+	<![CDATA[
+	The 25 version fixes known problems.<br>
+	New features include the ability to download updates. ]]>
+	</description>
+</ExtensionUpdateInformation>
