@@ -2,6 +2,14 @@ h2. Radish
 
 Simple version control for documents of Adobe InDesign/InCopy.
 
-After you install this script and restart the program using the menu command "File > Save Version" and "File > Versions..." for version control your documents.
+Using the menu commands "File/Save Version" and "File/Versions..." for the current document version control. Copies of the documents will be stored in a hidden folder ".versions". Delete it if you no longer need the all versions of your files, or to free up disk space.
 
 !http://radish.googlecode.com/files/screenshot.png!
+
+h3. Installation
+
+Download the file _radish.zxp_ and double-click it. Follow the instructions of Adobe Extension Manager.
+
+h3. Uninstall
+
+Run Adobe Extension Manager. Find the item "Radish" in the list and click "Remove" button.
