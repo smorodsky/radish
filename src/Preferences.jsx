@@ -24,14 +24,23 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 */
 
-// 2012-12-24
+// 2013-01-24
 
 // читаем настройки из radish.prefs
 ;(function() {
 	try {
 		radish.prefs = {};
+		
+		// priority settings file located in the script folder
 		radish.prefsFile = new File(app.activeScript.parent.absoluteURI + '/' + 
 			app.activeScript.getBaseName() + '.prefs');
+		
+		// default settings file located in the user folder
+		if (!radish.prefsFile.exists){
+			radish.prefsFile = new File(Folder.userData.absoluteURI + '/' + 
+			app.activeScript.getBaseName() + '.prefs');
+		}
+	
 		try {
 			var data = radish.prefsFile.readFile();
 			try {
@@ -66,7 +75,6 @@ IN THE SOFTWARE.
 		// enable asynchronous file copy
 		radish.prefs.useAsyncCopy = radish.prefs.useAsyncCopy === undefined ?
 			true : !!radish.prefs.useAsyncCopy;
-		if (File.fs != 'Macintosh') radish.prefs.useAsyncCopy = false;
 		// change file color label for opened files
 		radish.prefs.useColorLabels = radish.prefs.useColorLabels === undefined ? 
 			true : !!radish.prefs.useColorLabels;
@@ -119,8 +127,9 @@ radish.editPreferences = function() {
 	
 	grpMode.orientation = "column";
 	grpMode.alignChildren = 'left';
-	grpMode.minimumSize = [444, 20];
-	// в инкопи эта опция неприменима
+	grpMode.minimumSize = [500, 20];
+	
+    // в инкопи эта опция неприменима
 	if (!radish.isInCopy) {
 		var versionOnSave = grpMode.add('radioButton', undefined, localize({
 			en: 'Every save',
@@ -139,11 +148,11 @@ radish.editPreferences = function() {
 	var grpMisc = grpMain.add('panel');
 	grpMisc.orientation = "column";
 	grpMisc.alignChildren = 'left';
-	grpMisc.minimumSize = [444, 20];
+	grpMisc.minimumSize = [500, 20];
 	// save link versions
 	var versionsOfLinkedFiles = grpMisc.add('checkbox', undefined, localize({
-		en: 'Write version of links:',
-		ru: 'Сохранять версии линков:'}));
+		en: 'Write version of links,',
+		ru: 'Сохранять версии линков,'}));
 	
 	versionsOfLinkedFiles.value = radish.prefs.versionsOfLinkedFiles;
 	versionsOfLinkedFiles.addEventListener('click', function() {
@@ -177,52 +186,44 @@ radish.editPreferences = function() {
 	excludeLinksCaption.enabled = versionsOfLinkedFiles.value;
 	excludeLinksText.enabled = versionsOfLinkedFiles.value;
 	
+	// color labels
 	if (File.fs == 'Macintosh') {
 		var useColorLabels = grpMisc.add(
 			'checkbox', 
 			undefined, 
 			localize({
 				en: 'Change color label for opened documents',
-				ru: 'Менять цветовую метку при открытии документа'}));
+				ru: 'Менять цветовую метку пи открытии документа'}));
 		useColorLabels.value = radish.prefs.useColorLabels;
 	}
+	// async copy
+	var useAsyncCopy = grpMisc.add(
+		'checkbox', 
+		undefined, 
+		localize({
+			en: 'Copy files in the background',
+			ru: 'Фоновое копирование файлов'}));
+	useAsyncCopy.value = radish.prefs.useAsyncCopy;
+	
+	var useAsyncCopyTip = grpMisc.add(
+		'statictext', 
+		undefined, 
+		localize({
+			en: '      Disable this option if you receive an error message in the process of saving versions.',
+			ru: '      Отключите эту опцию если у вас появляются сообщения об ошибках копирования.'}));
+	useAsyncCopyTip.graphics.font = ScriptUI.newFont (
+		useAsyncCopyTip.graphics.font.family, 
+		useAsyncCopyTip.graphics.font.style,
+		useAsyncCopyTip.graphics.font.size - 3);
+	
 	var infoLine = grpMain.add('statictext', 
 		undefined, 
-		'Radish. Version control for files of Adobe InDesign/InCopy. Build ' + radish.build);
+		'Radish. Version control for files of Adobe InDesign and InCopy. Build ' + radish.build);
 	infoLine.graphics.font = ScriptUI.newFont (
 		infoLine.graphics.font.family, 
 		infoLine.graphics.font.style,
 		infoLine.graphics.font.size - 3);
 	
-    // button for open www-page
-    var url = 'http://github.com/smorodsky/radish';
-    
-    var infoURL = grpMain.add('statictext', undefined, url);
-    
-    infoURL.graphics.foregroundColor = infoURL.graphics.newPen(
-        infoURL.graphics.PenType.SOLID_COLOR, [0, 0, 1, 1], 1);
-        
-    infoURL.graphics.font = ScriptUI.newFont(
-        infoURL.graphics.font.family, 
-        "Bold", 
-        infoURL.graphics.font.size - 3);
-
-    infoURL.addEventListener ('click' , function(event){
-        if(File.fs == "Macintosh"){
-            var body = '\
-            tell application "Finder"\r\
-            open location "' + url + '"\r\
-            end tell';
-            app.doScript(body, ScriptLanguage.APPLESCRIPT_LANGUAGE);
-        } else {
-            var body =  '\
-            set objShell = CreateObject("Shell.Application")\r\
-            str = "' + url + '"\r\
-            objShell.ShellExecute str, "", "", "open", 1 ';
-            app.doScript(body, ScriptLanguage.VISUAL_BASIC);
-        }
-    });
-
 	// buttons
 	var grpButtons = w.add('group');
 	grpButtons.orientation = "column";
@@ -249,9 +250,13 @@ radish.editPreferences = function() {
 			excludeLinksText.text.replace(/[^a-z0-9]+/gi, ' ').split(' ').filter(function(i){
 				return i.length;
 			}).join(' ');
+		
 		if (File.fs == 'Macintosh') {
 			radish.prefs.useColorLabels = useColorLabels.value;
 		}
+		
+		radish.prefs.useAsyncCopy = useAsyncCopy.value;
+		
 		if ('makeVersionWithEverySave' in radish.prefs) {
 			delete radish.prefs.makeVersionWithEverySave;
 		}

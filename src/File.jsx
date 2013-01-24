@@ -24,7 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 */
 
-// 2011-12-28
+// 2013-01-24
 
 // get file name without extention
 File.prototype.getBaseName = function() {
@@ -146,6 +146,10 @@ File.prototype.hide = function() {
 	return this.setAttribute(2);
 }
 
+File.prototype.jsEncodedFsName = function() {
+    return this.fsName.replace(/\\/g, '\\\\');
+}
+
 // возвращает строку кодированную для использования в Applescript
 File.prototype.getApplescriptEncodedString = function(/* optional */ str) {
 	 
@@ -254,6 +258,7 @@ File.prototype.getSpotlightComment = function() {
 
 // асинхронное копирование файла
 File.prototype.asyncCopy = function(toFile) {
+	
 	try {
 		if (File.fs == 'Macintosh') {
 			var scpt = '\
@@ -269,9 +274,33 @@ end try                                                                  \
 			return true;
 		}
 		// windows
-		throw 0;
+        var scpt = '<?xml version="1.0" encoding="UTF-8"?>\
+<job id="rac"><script language="JScript">\
+\
+var fso = new ActiveXObject("Scripting.FileSystemObject");\
+\
+fso.CopyFile("' + this.jsEncodedFsName() + '", "' + toFile.jsEncodedFsName() + '");\
+fso.DeleteFile(WScript.ScriptFullName, true);\
+\
+</script></job>\
+        ';
+        
+		// write temporary script file
+        var scptFile = new File(Folder.appData.absoluteURI + '\\rac' + 
+            (new Date()).getTime() + '.wsf');
+        
+		scptFile.encoding = 'UTF-8';
+        
+        if (scptFile.exists || !scptFile.open('w') || !scptFile.write(scpt)) {
+            scptFile.close();
+            throw 0;
+        }
+        scptFile.close();
+        
+		if (!scptFile.execute()) throw 0;
+        
 	} catch (e) {
-		return this.copy(toFile);
+    	return this.copy(toFile);
 	}
 }
 
@@ -305,7 +334,7 @@ end try                                                                  \
 	if (this.exists) {
 		return false;
 	}
-	var fn = this.fsName.replace(/\\/g, '\\\\');
+	var fn = this.jsEncodedFsName();
 	var scpt = '\
 rem Based on a script found on the Thai Visa forum                 \
 rem http://www.thaivisa.com/forum/index.php?showtopic=21832        \
@@ -367,6 +396,7 @@ end if                                                       \
 	var flFolder = new Folder(toFolder.absoluteURI + '/!!broken_zip_file');
 	var broken_zip_file = flFolder.exists;
 	flFolder.remove();
+	
 	return toFolder.getFiles().length && !broken_zip_file;
 }
 
