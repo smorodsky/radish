@@ -24,7 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 */
 
-// 2011-12-28
+// 2013-01-28
 
 radish.showVersions = function() {
 	// return icon for document
@@ -83,64 +83,67 @@ radish.showVersions = function() {
 			radish.showVersions.btnRestore.enabled = 
 			versionsList.selection !== null;
 	}
-	if (!app.documents.length) return;
 	try {
 		var document = app.activeDocument;
+        if (!document.saved) throw 0;
 	} catch (e) {
-		return;
+		var document = null;
 	}
-	if (!document.saved) return;
-	// ищем линки в выделенных объектах
-	var link = null;
-	for (var i = 0, l = document.selection.length; i < l; i++) {
-		var sel = document.selection[i];
-		var excluded = radish.prefs.linksExcludedExts.toUpperCase().split(' ');
-		link = null;
-		
-		switch (sel.constructor.name) {
-			case 'Character':
-			case 'InsertionPoint':
-			case 'Line':
-			case 'Paragraph':
-			case 'Text':
-			case 'TextColumn':
-			case 'TextFrame':
-			case 'Word':
-				link = sel.parentStory.itemLink;
-				break;
-				
-			case 'Group':
-			case 'Oval':
-			case 'Poligon':
-			case 'Rectangle':
-				if (sel.allGraphics.length) {
-					link = sel.allGraphics[0].itemLink;
-				}
-				break;
-			
-			case 'Image':
-			case 'EPS':
-			case 'PDF':
-			case 'WMF':
-				link = sel.itemLink;
-				break;
-		}
-		if (link && link.isValid) {
-			// пропустим заблокированные типы
-			var ext = (new File(link.filePath)).getExt().toUpperCase();
-			if (excluded.indexOf(ext) >= 0) {
-				continue;
-			}
-			break;
-		}
-	}
-	// если выделен линк открываем его страницу версий
-	var activeFile = link ? new File(link.filePath).fsName :
-		document.fullName.fsName;
 	
-	var layoutFile = document.fullName;
-	var versionsFolder = layoutFile.getVersionsFolder(document);
-	var window = new Window('palette', localize({en:'Versions', ru:'Версии'}));
+    if (document) {
+        // ищем линки в выделенных объектах
+        var link = null;
+        for (var i = 0, l = document.selection.length; i < l; i++) {
+            var sel = document.selection[i];
+            var excluded = radish.prefs.linksExcludedExts.toUpperCase().split(' ');
+            link = null;
+            
+            switch (sel.constructor.name) {
+                case 'Character':
+                case 'InsertionPoint':
+                case 'Line':
+                case 'Paragraph':
+                case 'Text':
+                case 'TextColumn':
+                case 'TextFrame':
+                case 'Word':
+                    link = sel.parentStory.itemLink;
+                    break;
+                    
+                case 'Group':
+                case 'Oval':
+                case 'Poligon':
+                case 'Rectangle':
+                    if (sel.allGraphics.length) {
+                        link = sel.allGraphics[0].itemLink;
+                    }
+                    break;
+                
+                case 'Image':
+                case 'EPS':
+                case 'PDF':
+                case 'WMF':
+                    link = sel.itemLink;
+                    break;
+            }
+            if (link && link.isValid) {
+                // пропустим заблокированные типы
+                var ext = (new File(link.filePath)).getExt().toUpperCase();
+                if (excluded.indexOf(ext) >= 0) {
+                    continue;
+                }
+                break;
+            }
+        }
+    
+        // если выделен линк открываем его страницу версий
+        var activeFile = link ? new File(link.filePath).fsName :
+            document.fullName.fsName;
+        
+        var layoutFile = document.fullName;
+        var versionsFolder = layoutFile.getVersionsFolder(document);
+	}
+    var window = new Window('palette', localize({en:'Versions', ru:'Версии'}));
 	
 	window.orientation = 'row';
 	window.alignChildren = 'top';
@@ -148,35 +151,41 @@ radish.showVersions = function() {
 	var mainGroup = window.add("panel");
 	mainGroup.orientation = "column";
 	mainGroup.alignChildren = 'left';
-	var files = [layoutFile];
 	
-	// добавим линки
-	for (var i = document.links.length; i--;) {
-		var link = document.links[i];
-		var file = new File(link.filePath);
-		// skip doubles
-		try {
-			for (var j = files.length; j--;) {
-				if (files[j].fsName === file.fsName) {
-					throw 0;
-				}
-			}
-			files.push(file);
-		} catch (e) {}
-	}
-	// список файлов текущего макета
-	// filter files without versions
-	files = files.map(function(file, i){
-		return (0 == i || file.getDescriptionFile().exists) ? file : null;
-	}).filter(function(file) {
-		return file;
-	});
-	// sort
-	var file0 = files[0];
-	files = files.slice(1).sort(function(a, b) {
-		return a.name.toUpperCase() > b.name.toUpperCase();
-	});
-	files = [file0].concat(files);
+    var files = [];
+    
+    if (document) {
+        files = [layoutFile];
+        
+        // добавим линки
+        for (var i = document.links.length; i--;) {
+            var link = document.links[i];
+            var file = new File(link.filePath);
+            // skip doubles
+            try {
+                for (var j = files.length; j--;) {
+                    if (files[j].fsName === file.fsName) {
+                        throw 0;
+                    }
+                }
+                files.push(file);
+            } catch (e) {}
+        }
+        // список файлов текущего макета
+        // filter files without versions
+        files = files.map(function(file, i){
+            return (0 == i || file.getDescriptionFile().exists) ? file : null;
+        }).filter(function(file) {
+            return file;
+        });
+        // sort
+        var file0 = files[0];
+        files = files.slice(1).sort(function(a, b) {
+            return a.name.toUpperCase() > b.name.toUpperCase();
+        });
+        files = [file0].concat(files);
+    }
+    
 	var ddFiles = mainGroup.add("DropDownList", 
 		undefined, 
 		files.map(function(file){return decodeURI(file.name);}));
@@ -201,12 +210,12 @@ radish.showVersions = function() {
 	
 	var columnTitles = [
 		'', 
-		localize({en: 'Version', ru: 'Версия'}), 
-		localize({en: 'User', ru: 'Пользователь'}), 
-		localize({en: 'Date', ru: 'Дата'}), 
-		localize({en: 'Start Page', ru: 'Страница'}), 
+		localize({en: 'Version',     ru: 'Версия'}), 
+		localize({en: 'User',        ru: 'Пользователь'}), 
+		localize({en: 'Date',        ru: 'Дата'}), 
+		localize({en: 'Start Page',  ru: 'Страница'}), 
 		localize({en: 'Pages Count', ru: 'Всего страниц'}), 
-		localize({en: 'Chars', ru: 'Знаков'})
+		localize({en: 'Chars',       ru: 'Знаков'})
 	];
 	// список доступных версий
 	var versionsList = mainGroup.add('listbox', 
@@ -249,6 +258,17 @@ radish.showVersions = function() {
 			document.previewVersion(info[versionsList.selection.index].version);
 		}
 	}
+    
+    buttonsGroup.add('statictext', undefined, ' ');
+    
+    // preferences button
+    radish.showVersions.btnPrefs = buttonsGroup.add(
+		'button', 
+		undefined, 
+		localize({en:'Preferences...', ru:'Параметры...'})
+	);
+	radish.showVersions.btnPrefs.onClick = radish.editPreferences;
+      
 	// cancel button
 	buttonsGroup.add(
 		'button', 

@@ -1,8 +1,9 @@
-/* 
+﻿/* 
 Radish
 Version Control for a Adobe InDesign & InCopy
 
-Copyright: Konstantin SmorodskyLicense:   MIT
+Copyright: Konstantin Smorodsky
+License:   MIT
 
 Permission is hereby granted, free of charge, to any person obtaining a copy 
 of this software and associated documentation files (the "Software"), to 
@@ -23,7 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 */
 
-// 2011-12-28
+// 2013-01-28
 
 // menu installer
 radish.addMenuItems = function() {
@@ -35,22 +36,7 @@ radish.addMenuItems = function() {
 		var mnuAction = app.scriptMenuActions.add(localize({en: "Versions...", ru: "Версии..."}));
 		
 		// Attach the event listener
-		mnuAction.eventListeners.add('beforeDisplay', function(event) {
-	    	try {
-	    		event.target.enabled = false;
-	    		if (!radish.prefs.enabled || !app.documents.length) return;
-		    	try {
-		    		var document = app.activeDocument;
-		    	} catch (e) {
-		    		return;
-		    	}
-		    	event.target.enabled = document.saved;
-	    	} catch (e) {
-	    		radish.errorLog.writeError(e, event);
-	    	}
-	    });
-	 
-	     mnuAction.eventListeners.add('onInvoke', function(event) {
+		mnuAction.eventListeners.add('onInvoke', function(event) {
 	    	try {
 		    	radish.showVersions();
 	    	} catch (e) {
@@ -62,7 +48,7 @@ radish.addMenuItems = function() {
 		for (var i = app.menus.item(0).submenus.length; i--;) {
 			var fileMenu = app.menus.item(0).submenus[i];
 			var name = fileMenu.name;
-			if (name.indexOf('File') >=0 || name.indexOf('Файл') >=0) {
+			if (name.indexOf('File') >= 0 || name.indexOf('Файл') >= 0) {
 				break;
 			}
 		}
@@ -96,8 +82,8 @@ radish.addMenuItems = function() {
 		    		radish.errorLog.writeError(e, event);
 		    	}
 		    });
-		    
-		     mnuSaveVersion.eventListeners.add('onInvoke', function(event) {
+		   
+		    mnuSaveVersion.eventListeners.add('onInvoke', function(event) {
 		    	try {
 		    		if (!radish.prefs.enabled || !app.documents.length) return;
 		    		try {
@@ -121,20 +107,6 @@ radish.addMenuItems = function() {
 		    });
 			radish.menuSaveVersion = fileMenu.menuItems.add(mnuSaveVersion, LocationOptions.after, refItem);
 		}
-		// menu Rddish - Preferences
-		var mnuPrefs = app.scriptMenuActions.add(localize({
-			en: "Radish Preferences...", ru: "Настройки Radish..."}));
-		//mnuPrefs.eventListeners.add('beforeDisplay', function(event) {
-		//    event.target.enabled = true;
-		//});
-		mnuPrefs.eventListeners.add('onInvoke', function(event) {
-	    	try {
-	    		radish.editPreferences();
-	    	} catch (e) {
-	    		radish.errorLog.writeError(e, event);
-	    	}
-	    });
-		radish.menuPreferences = fileMenu.menuItems.add(mnuPrefs, LocationOptions.after, refItem);
 	} catch (e) {
 		radish.errorLog.writeError(e, {command: 'radish.addMenuItem'});	
 	}
