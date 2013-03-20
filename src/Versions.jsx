@@ -24,7 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 */
 
-// 2013-01-28
+// 2013-03-20
 
 radish.showVersions = function() {
 	// return icon for document
@@ -273,7 +273,7 @@ radish.showVersions = function() {
 	buttonsGroup.add(
 		'button', 
 		undefined, 
-		localize({en:'Cancel', ru:'Отмена'})
+		localize({en:'Close', ru:'Закрыть'})
 	).onClick = function () {
 		window.close();
 	}
