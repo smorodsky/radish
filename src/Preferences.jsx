@@ -46,7 +46,6 @@ radish.checkAsyncCopyStep2 = function() {
 	if (radish.prefs.useAsyncCopy != 1) return;
 
 	var fl = new File(Folder.temp + '/RadishUseAsyncCopy');
-	
 	radish.prefs.useAsyncCopy = fl.exists ? 2 : 0;
 	fl.remove();
 }
@@ -294,13 +293,6 @@ radish.editPreferences = function() {
 		if (useAsyncCopy.value) {
 			radish.prefs.useAsyncCopy = 1;
 			radish.checkAsyncCopyStep1();
-			$.sleep(2222);
-			radish.checkAsyncCopyStep2();
-			
-			if (radish.prefs.useAsyncCopy == 0) {
-				alert({en: 'Radish\nError. Do not have permissions to perform asynchronous file copy.',
-					ru: 'Radish\nОшибка. Недостаточно полномочий для выполнения асинхронного копирования файлов.'});
-			}
 		} else {
 			radish.prefs.useAsyncCopy = 0;
 		}
