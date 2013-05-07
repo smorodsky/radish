@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionUpdateInformation>
-	<version>27</version>
+	<version>28</version>
 	<download>http://github.com/smorodsky/radish/raw/master/radish.zxp</download>
 	<description url="http://raw.github.com/smorodsky/radish/master/updates/updates.html">
 	<![CDATA[
-	The 27 version fixes known problems.<br>
-	New features include the ability to download updates. ]]>
+	The 28 version fixes known problems.<br>
+More reliable asynchronous copying. ]]>
 	</description>
 </ExtensionUpdateInformation>

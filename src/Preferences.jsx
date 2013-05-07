@@ -24,7 +24,32 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 */
 
-// 2013-01-24
+// 2013-05-07
+
+// создает тестовый файл для поверки возможности фонового корпирования
+radish.checkAsyncCopyStep1 = function() {
+	radish.prefs.useAsyncCopy = 1;
+	var src = new File(Folder.temp + '/radish' + (new Date()).getTime());
+	var dest = new File(Folder.temp + '/RadishUseAsyncCopy');
+	src.open('w') && src.write(new Date()) && src.close();
+	
+	try {
+		if (!src.asyncCopy(dest)) throw 0;
+	} catch (e) {
+		radish.prefs.useAsyncCopy = 0;
+	}
+	src.remove();
+}
+
+// проверяет наличие тестового файла
+radish.checkAsyncCopyStep2 = function() {
+	if (radish.prefs.useAsyncCopy != 1) return;
+
+	var fl = new File(Folder.temp + '/RadishUseAsyncCopy');
+	
+	radish.prefs.useAsyncCopy = fl.exists ? 2 : 0;
+	fl.remove();
+}
 
 // читаем настройки из radish.prefs
 ;(function() {
@@ -63,28 +88,37 @@ IN THE SOFTWARE.
 			true : !!radish.prefs.enabled;
 		// other scripts sync
 		app.scriptArgs.setValue('radish', 'enable');
+		
 		// automaticaly write versions:
 		// 0 - manualy
 		// 1 - with document close
 		// 2 - with every save
-		if (radish.prefs.mode === undefined) radish.prefs.mode = 1;
+		if (typeof radish.prefs.mode == 'undefined') radish.prefs.mode = 1;
 		radish.prefs.mode = parseInt(radish.prefs.mode, 10);
+		
 		if (isNaN(radish.prefs.mode) || radish.prefs.mode < 0 || radish.prefs.mode > 2) {
 			radish.prefs.mode = 1;
 		}
 		// enable asynchronous file copy
-		radish.prefs.useAsyncCopy = radish.prefs.useAsyncCopy === undefined ?
-			true : !!radish.prefs.useAsyncCopy;
+		if (typeof radish.prefs.useAsyncCopy == 'undefined' || radish.prefs.useAsyncCopy) {
+			radish.prefs.useAsyncCopy = 1;
+		}
+		radish.prefs.useAsyncCopy = Number(radish.prefs.useAsyncCopy); // for compatible
+		
+		// test async copy
+		if (radish.prefs.useAsyncCopy > 0) radish.checkAsyncCopyStep1();
+		
 		// change file color label for opened files
 		radish.prefs.useColorLabels = radish.prefs.useColorLabels === undefined ? 
 			true : !!radish.prefs.useColorLabels;
+		
 		if (File.fs != 'Macintosh') radish.prefs.useColorLabels = false;
 		// write version of linked files
 		radish.prefs.versionsOfLinkedFiles = radish.prefs.versionsOfLinkedFiles === undefined ? 
 			true : !!radish.prefs.versionsOfLinkedFiles;
 		// exclude links by name extention
 		radish.prefs.linksExcludedExts = radish.prefs.linksExcludedExts === undefined ? 
-			'ai eps jpg jpeg pdf psd tif tiff' : radish.prefs.linksExcludedExts;
+			'ai eps jpg jpeg pdf png psd tif tiff' : radish.prefs.linksExcludedExts;
 		
 		// path to resources files
 		radish.resFolder = app.activeScript.parent.fsName;
@@ -193,7 +227,7 @@ radish.editPreferences = function() {
 			undefined, 
 			localize({
 				en: 'Change color label for opened documents',
-				ru: 'Менять цветовую метку пи открытии документа'}));
+				ru: 'Менять цветовую метку при открытии документа'}));
 		useColorLabels.value = radish.prefs.useColorLabels;
 	}
 	// async copy
@@ -203,8 +237,9 @@ radish.editPreferences = function() {
 		localize({
 			en: 'Copy files in the background',
 			ru: 'Фоновое копирование файлов'}));
-	useAsyncCopy.value = radish.prefs.useAsyncCopy;
+	useAsyncCopy.value = radish.prefs.useAsyncCopy > 0;
 	
+	/*
 	var useAsyncCopyTip = grpMisc.add(
 		'statictext', 
 		undefined, 
@@ -215,6 +250,7 @@ radish.editPreferences = function() {
 		useAsyncCopyTip.graphics.font.family, 
 		useAsyncCopyTip.graphics.font.style,
 		useAsyncCopyTip.graphics.font.size - 3);
+	*/
 	
 	var infoLine = grpMain.add('statictext', 
 		undefined, 
@@ -255,7 +291,19 @@ radish.editPreferences = function() {
 			radish.prefs.useColorLabels = useColorLabels.value;
 		}
 		
-		radish.prefs.useAsyncCopy = useAsyncCopy.value;
+		if (useAsyncCopy.value) {
+			radish.prefs.useAsyncCopy = 1;
+			radish.checkAsyncCopyStep1();
+			$.sleep(2222);
+			radish.checkAsyncCopyStep2();
+			
+			if (radish.prefs.useAsyncCopy == 0) {
+				alert({en: 'Radish\nError. Do not have permissions to perform asynchronous file copy.',
+					ru: 'Radish\nОшибка. Недостаточно полномочий для выполнения асинхронного копирования файлов.'});
+			}
+		} else {
+			radish.prefs.useAsyncCopy = 0;
+		}
 		
 		if ('makeVersionWithEverySave' in radish.prefs) {
 			delete radish.prefs.makeVersionWithEverySave;
