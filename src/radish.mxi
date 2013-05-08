@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <macromedia-extension
 	name="Radish"
-	version="28"
+	version="29"
 	type="Command">
 
 	<!-- Describe the author -->

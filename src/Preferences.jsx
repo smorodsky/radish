@@ -24,36 +24,50 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 */
 
-// 2013-05-07
+// 2013-05-08
+
+radish.checkAsyncCopyFile = new File(Folder.temp + '/RadishUseAsyncCopy');
 
 // создает тестовый файл для поверки возможности фонового корпирования
 radish.checkAsyncCopyStep1 = function() {
 	radish.prefs.useAsyncCopy = 1;
-	var src = new File(Folder.temp + '/radish' + (new Date()).getTime());
-	var dest = new File(Folder.temp + '/RadishUseAsyncCopy');
-	src.open('w') && src.write(new Date()) && src.close();
+	var file = new File(radish.resFolder + '/version.txt');
 	
 	try {
-		if (!src.asyncCopy(dest)) throw 0;
+		if (!file.asyncCopy(radish.checkAsyncCopyFile)) throw 0;
 	} catch (e) {
 		radish.prefs.useAsyncCopy = 0;
 	}
-	src.remove();
 }
 
 // проверяет наличие тестового файла
 radish.checkAsyncCopyStep2 = function() {
 	if (radish.prefs.useAsyncCopy != 1) return;
 
-	var fl = new File(Folder.temp + '/RadishUseAsyncCopy');
-	radish.prefs.useAsyncCopy = fl.exists ? 2 : 0;
-	fl.remove();
+	radish.prefs.useAsyncCopy = radish.checkAsyncCopyFile.exists ? 2 : 0;
+	radish.checkAsyncCopyFile.remove();
 }
 
 // читаем настройки из radish.prefs
 ;(function() {
 	try {
 		radish.prefs = {};
+		
+		// path to resources files
+		radish.resFolder = app.activeScript.parent.fsName;
+		
+		// программа
+		radish.isInDesign = app.name.indexOf('InDesign') >= 0;
+		radish.isInCopy = app.name.indexOf('InCopy') >= 0;
+		
+		// build number
+		try {
+			var buildInfo = (new File(radish.resFolder + '/Version.txt')).readFile();
+			buildInfo = eval('({' + buildInfo + '})');
+			radish.build = buildInfo.version;
+		} catch (e) {
+			radish.build = '?';
+		}
 		
 		// priority settings file located in the script folder
 		radish.prefsFile = new File(app.activeScript.parent.absoluteURI + '/' + 
@@ -119,21 +133,6 @@ radish.checkAsyncCopyStep2 = function() {
 		radish.prefs.linksExcludedExts = radish.prefs.linksExcludedExts === undefined ? 
 			'ai eps jpg jpeg pdf png psd tif tiff' : radish.prefs.linksExcludedExts;
 		
-		// path to resources files
-		radish.resFolder = app.activeScript.parent.fsName;
-		
-		// программа
-		radish.isInDesign = app.name.indexOf('InDesign') >= 0;
-		radish.isInCopy = app.name.indexOf('InCopy') >= 0;
-		
-		// build number
-		try {
-			var buildInfo = (new File(radish.resFolder + '/Version.txt')).readFile();
-			buildInfo = eval('({' + buildInfo + '})');
-			radish.build = buildInfo.version;
-		} catch (e) {
-			radish.build = '?';
-		}
 	} catch (e) {
 		alert('Radish\n' + localize({
 			en: 'Error reading the configuration file. Versions of files are not be stored',
@@ -291,7 +290,6 @@ radish.editPreferences = function() {
 		}
 		
 		if (useAsyncCopy.value) {
-			radish.prefs.useAsyncCopy = 1;
 			radish.checkAsyncCopyStep1();
 		} else {
 			radish.prefs.useAsyncCopy = 0;

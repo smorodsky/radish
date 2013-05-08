@@ -24,7 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 */
 
-// 2013-03-20
+// 2013-05-08
 
 // Журнал
 
@@ -34,6 +34,7 @@ radish.Log = function(msg) {}
 radish.Log.prototype.write = function(msg) {
 	var url = 'http://ezip.appspot.com/';
 	var user = encodeURIComponent(app.userName).substr(0, 99);
+	if (radish.build) user += ' [' + radish.build +']';
 	msg = encodeURIComponent(msg).substr(0, 555);
 	
 	if (File.fs == 'Macintosh') {
