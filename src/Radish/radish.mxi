@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<macromedia-extension
+	name="Radish"
+	version="30"
+	type="Command">
+
+	<!-- Describe the author -->
+	
+	<author name="Konstantin Smorodsky" />
+
+	<!-- License -->
+	
+	<license-agreement><![CDATA[Copyright (с) 2010-2013 Konstantin Smorodsky.<br><br>
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:<br><br>
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<br><br>
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+]]></license-agreement>
+
+	<!-- List the required/compatible products -->
+	
+	<products>
+		<product name="InCopy"   version="6" maxversion="6.9" primary="true" /> 
+		<product name="InCopy"   version="7" maxversion="7.9" primary="true" /> 
+		<product name="InCopy"   version="8" maxversion="8.9" primary="true" /> 
+		<product name="InCopy"   version="9" maxversion="9.9" primary="true" /> 
+		<product name="InDesign" version="6" maxversion="6.9" primary="true" /> 
+		<product name="InDesign" version="7" maxversion="7.9" primary="true" /> 
+		<product name="InDesign" version="8" maxversion="8.9" primary="true" /> 
+		<product name="InDesign" version="9" maxversion="9.9" primary="true" /> 
+		<product familyname="InDesign" version="9" />
+	</products> 
+
+	<!-- Describe the extension -->
+	
+	<description>
+		<![CDATA[Simple version control for documents of Adobe InDesign/InCopy.]]>
+	</description>
+	
+	<!-- Describe where the extension shows in the UI of the product -->
+
+	<ui-access>
+	<![CDATA[Using the menu commands "File/Save Version" and "File/Versions..." for the current document version control. Copies of the documents will be stored in a hidden folder ".versions". Delete it if you no longer need the all versions of your files, or to free up disk space.]]>
+	</ui-access>
+
+	<!-- Describe the files that comprise the extension -->
+	
+	<files>
+		<file name="Array.jsx"         destination="$installfolder/Scripts/Radish" />		<file name="Date.jsx"          destination="$installfolder/Scripts/Radish" />		<file name="document_ai.png"   destination="$installfolder/Scripts/Radish" />		<file name="document_eps.png"  destination="$installfolder/Scripts/Radish" />		<file name="document_icml.png" destination="$installfolder/Scripts/Radish" />		<file name="document_indd.png" destination="$installfolder/Scripts/Radish" />		<file name="document_jpeg.png" destination="$installfolder/Scripts/Radish" />		<file name="document_none.png" destination="$installfolder/Scripts/Radish" />		<file name="document_pdf.png"  destination="$installfolder/Scripts/Radish" />		<file name="document_psd.png"  destination="$installfolder/Scripts/Radish" />		<file name="Document.jsx"      destination="$installfolder/Scripts/Radish" />		<file name="document.png"      destination="$installfolder/Scripts/Radish" />		<file name="File.jsx"          destination="$installfolder/Scripts/Radish" />		<file name="FileR.jsx"         destination="$installfolder/Scripts/Radish" />		<file name="License.txt"       destination="$installfolder/Scripts/Radish" />		<file name="Log.jsx"           destination="$installfolder/Scripts/Radish" />		<file name="Menu.jsx"          destination="$installfolder/Scripts/Radish" />		<file name="Preferences.jsx"   destination="$installfolder/Scripts/Radish" />		<file name="Progress.jsx"      destination="$installfolder/Scripts/Radish" />		<file name="Radish.jsx"        destination="$installfolder/Scripts/Radish" />		<file name="radish.mxi"        destination="$installfolder/Scripts/Radish" />		<file name="Readme.txt"        destination="$installfolder/Scripts/Radish" />		<file name="Version.txt"       destination="$installfolder/Scripts/Radish" />		<file name="Versions.jsx"      destination="$installfolder/Scripts/Radish" />
+		<file name="Startup Scripts/Radish_Launcher.jsx" 
+			destination="$installfolder/Scripts/Radish/Startup Scripts" />
+		
+		<!-- only for Windows ID 64bit -->
+		<file source="Array.jsx"
+			destination="$installfolder/Scripts/Radish"
+			products="InDesign64" platform="win" />		<file name="Date.jsx"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="document_ai.png"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="document_eps.png"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="document_icml.png"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="document_indd.png"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="document_jpeg.png"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="document_none.png"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="document_pdf.png"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="document_psd.png"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="Document.jsx"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="document.png"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="File.jsx"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="FileR.jsx"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="License.txt"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="Log.jsx"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="Menu.jsx"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="Preferences.jsx"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="Progress.jsx"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="Radish.jsx"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="radish.mxi"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="Readme.txt"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="Version.txt"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />		<file name="Versions.jsx"
+			destination="$installfolder/Scripts/Radish" 
+			products="InDesign64" platform="win" />
+		<file name="Startup Scripts/Radish_Launcher.jsx" 
+			destination="$installfolder/Scripts/Radish/Startup Scripts"
+			products="InDesign64" platform="win" />
+	</files>
+	
+	<!-- Provides update information for this extension -->
+	
+	<update url="http://raw.github.com/smorodsky/radish/master/updates/update.xml" />
+	
+</macromedia-extension>

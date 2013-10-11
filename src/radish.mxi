@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <macromedia-extension
 	name="Radish"
-	version="29"
+	version="30"
 	type="Command">
 
 	<!-- Describe the author -->
@@ -19,14 +19,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 	<!-- List the required/compatible products -->
 	
 	<products>
-		<product name="InCopy"   version="6"   primary="true" /> 
-		<product name="InCopy"   version="7"   primary="true" /> 
-		<product name="InCopy"   version="7.5" primary="true" /> 
-		<product name="InCopy"   version="8"   primary="true" /> 
-		<product name="InDesign" version="6"   primary="true" /> 
-		<product name="InDesign" version="7"   primary="true" /> 
-		<product name="InDesign" version="7.5" primary="true" /> 
-		<product name="InDesign" version="8"   primary="true" /> 
+		<product name="InCopy"   version="6" maxversion="6.9" primary="true" /> 
+		<product name="InCopy"   version="7" maxversion="7.9" primary="true" /> 
+		<product name="InCopy"   version="8" maxversion="8.9" primary="true" /> 
+		<product name="InCopy"   version="9" maxversion="9.9" primary="true" /> 
+		<product name="InDesign" version="6" maxversion="6.9" primary="true" /> 
+		<product name="InDesign" version="7" maxversion="7.9" primary="true" /> 
+		<product name="InDesign" version="8" maxversion="8.9" primary="true" /> 
+		<product name="InDesign" version="9" maxversion="9.9" primary="true" /> 
+		<product familyname="InDesign" version="9" />
 	</products> 
 
 	<!-- Describe the extension -->
@@ -44,9 +45,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 	<!-- Describe the files that comprise the extension -->
 	
 	<files>
-		<file name="Array.jsx"         destination="$installfolder/Scripts/Radish" />		<file name="Date.jsx"          destination="$installfolder/Scripts/Radish" />		<file name="document_ai.png"   destination="$installfolder/Scripts/Radish" />		<file name="document_eps.png"  destination="$installfolder/Scripts/Radish" />		<file name="document_icml.png" destination="$installfolder/Scripts/Radish" />		<file name="document_indd.png" destination="$installfolder/Scripts/Radish" />		<file name="document_jpeg.png" destination="$installfolder/Scripts/Radish" />		<file name="document_none.png" destination="$installfolder/Scripts/Radish" />		<file name="document_pdf.png"  destination="$installfolder/Scripts/Radish" />		<file name="document_psd.png"  destination="$installfolder/Scripts/Radish" />		<file name="Document.jsx"      destination="$installfolder/Scripts/Radish" />		<file name="document.png"      destination="$installfolder/Scripts/Radish" />		<file name="File.jsx"          destination="$installfolder/Scripts/Radish" />		<file name="FileR.jsx"         destination="$installfolder/Scripts/Radish" />		<file name="License.txt"       destination="$installfolder/Scripts/Radish" />		<file name="Log.jsx"           destination="$installfolder/Scripts/Radish" />		<file name="Menu.jsx"          destination="$installfolder/Scripts/Radish" />		<file name="Preferences.jsx"   destination="$installfolder/Scripts/Radish" />		<file name="Progress.jsx"      destination="$installfolder/Scripts/Radish" />		<file name="Radish.jsx"        destination="$installfolder/Scripts/Radish" />		<file name="radish.mxi"        destination="$installfolder/Scripts/Radish" />		<file name="Readme.txt"        destination="$installfolder/Scripts/Radish" />		<file name="Version.txt"       destination="$installfolder/Scripts/Radish" />		<file name="Versions.jsx"      destination="$installfolder/Scripts/Radish" />
-		<file name="Startup Scripts/Radish_Launcher.jsx" 
-			destination="$installfolder/Scripts/Radish/Startup Scripts" />	</files>
+		<file source="Radish/"
+			destination="$installfolder/Scripts/"
+			products="InDesign" platform="mac" />		
+		<file source="Radish/"
+			destination="$installfolder/Scripts/"
+			products="InDesign" platform="win" />		
+		<file source="Radish/"
+			destination="$installfolder/Scripts/"
+			products="InDesign64" platform="win" />	</files>
 	
 	<!-- Provides update information for this extension -->
 	

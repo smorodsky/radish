@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionUpdateInformation>
-	<version>28</version>
+	<version>30</version>
 	<download>http://github.com/smorodsky/radish/raw/master/radish.zxp</download>
 	<description url="http://raw.github.com/smorodsky/radish/master/updates/updates.html">
 	<![CDATA[
-	The 28 version fixes known problems.<br>
-More reliable asynchronous copying. ]]>
+	The 30 version fixes compatibilities with InDesign 64 bit.]]>
 	</description>
 </ExtensionUpdateInformation>
