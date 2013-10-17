@@ -1,4 +1,4 @@
-﻿/* 
+/* 
 Radish
 Version Control for Adobe InDesign & Adobe InCopy
 
@@ -24,7 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 */
 
-// 2013-05-08
+// 2013-10-16
 
 // Журнал
 
@@ -34,7 +34,22 @@ radish.Log = function(msg) {}
 radish.Log.prototype.write = function(msg) {
 	var url = 'http://ezip.appspot.com/';
 	var user = encodeURIComponent(app.userName).substr(0, 99);
-	if (radish.build) user += ' [' + radish.build +']';
+	var appVersion = app.version;
+	
+	switch (app.name) {
+		case 'Adobe InDesign':
+			var appName = 'd';
+			break;
+		
+		case 'Adobe InCopy':
+			var appName = 'c';
+			break;
+			
+		default:
+			var appName = '?';
+	}
+	
+	if (radish.build) user += ' [' + appVersion + appName + radish.build +']';
 	msg = encodeURIComponent(msg).substr(0, 555);
 	
 	if (File.fs == 'Macintosh') {

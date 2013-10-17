@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionUpdateInformation>
-	<version>30</version>
+	<version>31</version>
 	<download>http://github.com/smorodsky/radish/raw/master/radish.zxp</download>
 	<description url="http://raw.github.com/smorodsky/radish/master/updates/updates.html">
 	<![CDATA[
-	The 30 version fixes compatibilities with InDesign 64 bit.]]>
+	The 31 version fixes compatibilities with InCopy 64 bit.]]>
 	</description>
 </ExtensionUpdateInformation>
